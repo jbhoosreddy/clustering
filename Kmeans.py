@@ -1,41 +1,11 @@
 from __future__ import division
-import random
 from operator import itemgetter
 from copy import deepcopy
+from helper import load_data, print_list, pick_random
 
-random.seed(0)
 
 INPUT_FILE = 'cho.txt'
 CLUSTERS = 5
-
-
-def load_data(file_name):
-    file = open(file_name)
-    data = file.read()
-    file.close()
-    output = []
-    for line in data.split("\n"):
-        tokens = line.split("\t")
-        output.append({
-            'id': tokens[0],
-            'truth': int(tokens[1]),
-            'expressions': map(lambda x: float(x), tokens[2:]),
-            'centroid': 0
-        })
-    return filter(lambda x: x['truth'] != -1, output)
-
-
-def pick_random(l):
-    return random.choice(l)
-
-
-def print_list(l, c=None):
-    for i in l:
-        print i
-        if c:
-            c -= 1
-            if not c:
-                break
 
 
 def distance(a1, a2):
@@ -50,10 +20,12 @@ def compute_distance(centroids, data):
 
 def intial_centroids(data):
     centroids = list()
+    i = 1
     while len(centroids) < CLUSTERS:
-        picked = pick_random(data)
+        picked = pick_random(data, i)
         if not len(filter(lambda c: c['id'] == picked['id'], centroids)):
             centroids.append(picked)
+            i += 1
     return centroids
 
 
@@ -82,12 +54,8 @@ def compute_centroid(expressions):
 
 
 def converged(prev, next):
-    length = len(filter(lambda i: comparing(prev[i]['centroid'], next[i]['centroid']), xrange(len(prev))))
+    length = len(filter(lambda i: prev[i]['centroid'] != next[i]['centroid'], xrange(len(prev))))
     return length == 0
-
-
-def comparing(p_centroid, n_centroid):
-    return p_centroid != n_centroid
 
 
 if __name__ == "__main__":
