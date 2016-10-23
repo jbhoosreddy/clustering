@@ -9,13 +9,13 @@ CLUSTERS = 5
 
 
 def distance(a1, a2):
-    a1, a2, l = list(a1['expressions']), list(a2['expressions']), len(a1['expressions'])
+    l = len(a1)
     return pow(reduce(lambda x, y: x+y, map(lambda i: pow(a1[i]-a2[i], l), xrange(l))), (1/l))
 
 
 def compute_distance(centroids, data):
     for d in data:
-        d['centroid'] = min(enumerate(map(lambda c: distance(d, c), centroids)), key=itemgetter(1))[0]
+        d['cluster'] = min(enumerate(map(lambda c: distance(d['expressions'], c['expressions']), centroids)), key=itemgetter(1))[0] + 1
 
 
 def intial_centroids(data):
@@ -32,10 +32,10 @@ def intial_centroids(data):
 def compute_centroids(data):
     centroids = list()
     for i in xrange(CLUSTERS):
-        filtered = filter(lambda d: d['centroid'] == i, data)
+        filtered = filter(lambda d: d['cluster'] == i+1, data)
         expressions = map(lambda f: f['expressions'], filtered)
         centroid = compute_centroid(expressions)
-        centroid['centroid'] = i
+        centroid['cluster'] = i+1
         centroids.append(centroid)
     return centroids
 
@@ -54,7 +54,7 @@ def compute_centroid(expressions):
 
 
 def converged(prev, next):
-    length = len(filter(lambda i: prev[i]['centroid'] != next[i]['centroid'], xrange(len(prev))))
+    length = len(filter(lambda i: prev[i]['cluster'] != next[i]['cluster'], xrange(len(prev))))
     return length == 0
 
 
