@@ -39,7 +39,6 @@ def distance(a1, a2):
 
 def join(l1, l2, key, method, l):
     idx1 = set(map(lambda x: x[key], l1))
-    # print rules1, idx1
     idx2 = set(map(lambda x: x[key], l2))
     if method == 'union':
         idx = idx1.union(idx2)

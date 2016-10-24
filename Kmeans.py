@@ -59,7 +59,6 @@ def converged(prev, next):
 
 
 if __name__ == "__main__":
-    # delta = list()
     data = load_data(INPUT_FILE)
     prev = deepcopy(data)
     centroids = intial_centroids(data)

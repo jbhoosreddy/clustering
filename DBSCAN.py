@@ -1,9 +1,10 @@
+from __future__ import division
 from helper import load_data, print_list, join
 
 
 INPUT_FILE = 'cho.txt'
 EPS = 0.5
-MIN_POINTS = 3
+MIN_POINTS = 390
 
 
 def region_query(P, eps, remaining):
@@ -20,15 +21,16 @@ def expand_cluster(P, neighbors, C, eps, min_points, remaining):
     while True:
         remaining_points = get_remaining(neighbors)
         if not len(remaining_points):
-            for P_prime in remaining_points:
-                if not P_prime['visited']:
-                    P_prime['visited'] = True
-                    remaining = get_remaining(remaining)
-                    neighbors_prime = region_query(P_prime, eps, remaining)
-                    if len(neighbors_prime) >= min_points:
-                        neighbors = join(neighbors, neighbors_prime, 'id', 'union', remaining)
-                if not P_prime['cluster']:
-                    P_prime['cluster'] = C
+            break
+        for P_prime in remaining_points:
+            if not P_prime['visited']:
+                P_prime['visited'] = True
+                remaining = get_remaining(remaining)
+                neighbors_prime = region_query(P_prime, eps, remaining)
+                if len(neighbors_prime) >= min_points:
+                    neighbors = join(neighbors, neighbors_prime, 'id', 'union', remaining)
+            if not P_prime['cluster']:
+                P_prime['cluster'] = C
 
 
 def get_remaining(data):
@@ -41,11 +43,13 @@ def DBSCAN(D, eps, min_points):
         remaining = get_remaining(D)
         if not len(remaining):
             break
+        print "main", len(remaining)
         for P in remaining:
             P['visited'] = True
             neighbors = region_query(P, eps, get_remaining(remaining))
             if len(neighbors) < min_points:
-                P['cluster'] = -1
+                if not P['cluster']:
+                    P['cluster'] = -1
             else:
                 C += 1
                 expand_cluster(P, neighbors, C, eps, min_points, remaining)
@@ -56,3 +60,4 @@ if __name__ == "__main__":
     # print_list(D)
     DBSCAN(D, EPS, MIN_POINTS)
     print_list(D)
+
