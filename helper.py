@@ -1,3 +1,4 @@
+from __future__ import division
 import random
 random.seed(0)
 
@@ -22,6 +23,15 @@ def load_data(file_name):
 def print_list(l, c=None):
     for i in l:
         print i
+        if c:
+            c -= 1
+            if not c:
+                break
+
+
+def print_dict(d, c=None):
+    for k,v in d.items():
+        print k,v
         if c:
             c -= 1
             if not c:
