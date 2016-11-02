@@ -38,7 +38,8 @@ def find_min_distance(matrix, newSet):
 
     d = sys.maxint
     den = 0
-    combinations = itertools.combinations(newSet,2)
+    combinations = itertools.combinations(newSet, 2)
+    #print newSet
     for combination in combinations:
         sub_permutation = itertools.permutations(combination, 2)
         for sub_subset in sub_permutation:
@@ -52,25 +53,39 @@ def find_min_distance(matrix, newSet):
         if(den < d):
             d = matrix[sub_subset]
 
+    #print 'end of find min'
     return d
+
+def del_matrix(old_matrix, closest):
+    print 'before', len(old_matrix)
+    for id in closest:
+        for k,v in old_matrix.items():
+            if id in k:
+                #print 'in if', k
+                del old_matrix[k]
+    print 'after', len(old_matrix)
+    return old_matrix
 
 
 def update_matrix(initial_matrix, matrix, closest, id_set):
 
-    print 'closest points' , closest
+    print 'closest points', closest
     newMatrix = deepcopy(matrix)
     #cluster = ','.join(closest)
     #print type(cluster)
-    del newMatrix[closest] # delete the closest point distance from the matrix
+    newMatrix = del_matrix(newMatrix, closest) # delete the closest point distance from the matrix
 
+    print len(newMatrix)
     print 'delete complete'
-    newSet = list(closest)
+    #newSet = list(closest)
     for key in id_set:
-        new_tuple = tuple(newSet)
+        newSet = list(closest)
         newSet.append(key)
+        new_tuple = tuple(newSet)
         dist = find_min_distance(initial_matrix, new_tuple)
         newMatrix[new_tuple] = dist
 
+    print 'returning'
     return newMatrix
 
 
@@ -83,7 +98,10 @@ if __name__ == "__main__":
     matrix_list = list()
     iteration = 0
     matrix_list.append(matrix)
-    while len(id_set) > 1:
+    while len(matrix) > 1:
+        print iteration
+        iteration += 1
+        print 'in while'
         closest = find_closest(matrix)
         for id in closest:
             if id in id_set:
