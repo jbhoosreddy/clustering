@@ -1,8 +1,8 @@
 from __future__ import division
-from helper import load_data, print_list, join
+from helper.utils import load_data, print_list, join
 
 
-INPUT_FILE = 'cho.txt'
+INPUT_FILE = 'data/cho.txt'
 EPS = 2
 MIN_POINTS = 100
 

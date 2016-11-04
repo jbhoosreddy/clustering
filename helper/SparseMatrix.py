@@ -1,4 +1,5 @@
 from utils import load_data
+from scipy.spatial.distance import cdist
 from utils import print_dict, print_list
 from utils import distance
 from copy import deepcopy
@@ -6,18 +7,29 @@ import sys, itertools, pickle
 
 
 class SparseMatrix(object):
-    def __init__(self, data):
+    def __init__(self, data=None):
         self.id = 0
         self.data = data
         self.original = None
-        self.matrix = None
-        self.history = list()
+        self.matrix = dict()
+        self.history = dict()
         self.clusters = list()
         self.points = None
-        self.create_matrix()
+        if self.data is not None:
+            self.create_matrix()
 
     def size(self):
-        return len(self.matrix)
+        return len(self.points)
+
+    def get(self, i, j):
+        if i == j:
+            return 1
+        if (i,j) in self.matrix.keys():
+            return self.matrix[(i,j)]
+        return 0
+
+    def set(self, i, j, value):
+        self.matrix[(i,j)] = value
 
     def create_matrix(self):
         original = dict()
@@ -49,7 +61,7 @@ class SparseMatrix(object):
 
     def update(self, method="closest"):
         self.id += 1
-        self.history.append(deepcopy(self.matrix))
+        self.history[self.size()] = deepcopy(self.points)
         closest = self.find(method)
         for k in closest:
             self.points.remove(k)
@@ -64,13 +76,9 @@ class SparseMatrix(object):
             self.matrix[(cluster, p)] = d
         self.points.add(cluster)
 
-    def find_distance(self, p, cluster, method="closest"):
-        original = self.original
+    def _find_distance(self, points, cluster, method="closest"):
         d = sys.maxint
-        points = list(deepcopy(cluster))
-        points.extend(p)
-        points = list(points)
-
+        original = self.original
         combinations = itertools.combinations(points, 2)
         for combination in combinations:
             sub_permutation = itertools.permutations(combination, 2)
@@ -95,6 +103,27 @@ class SparseMatrix(object):
                             d = original[sub_subset]
                             break
         return d
+
+    def find_distance(self, p, cluster, method="closest", implementation="default"):
+        points = list(cluster)
+        points.extend(p)
+        points = list(points)
+        if method == "closest":
+            func = min
+        else:
+            func = max
+        if implementation == "builtin":
+            return self._find_distance(points, cluster)
+        elif implementation == "default":
+            filtered = filter(lambda d: d['id'] in points, self.data)
+            filtered_points = filter(lambda f: f['id'] in p, filtered)
+            filtered_cluster = filter(lambda f: f['id'] in cluster, filtered)
+            filtered_points_expressions = map(lambda f: f['expressions'], filtered_points)
+            filtered_cluster_expressions = map(lambda f: f['expressions'], filtered_cluster)
+            distance_matrix = cdist(filtered_points_expressions, filtered_cluster_expressions, p=2)
+            return func(map(lambda dm: reduce(func, dm), distance_matrix))
+
+
 
     def save(self, filename):
         handle = open('output/'+filename+".pickle", 'w')

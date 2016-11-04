@@ -49,10 +49,13 @@ def print_dict(d, c=None, should_print=True):
 def pick_random(ll, i):
     return random.choice(filter(lambda l: l['truth'] == i, ll))
 
+def pick(ll, i):
+    return filter(lambda l: l['id'] == i, ll)[0]
 
 def distance(a1, a2):
     a1, a2, l = list(a1['expressions']), list(a2['expressions']), len(a1['expressions'])
-    return pow(reduce(lambda x, y: x+y, map(lambda i: pow(abs(a1[i]-a2[i]), l), xrange(l))), (1/l))
+    p = 2
+    return pow(reduce(lambda x, y: x+y, map(lambda i: pow(abs(a1[i]-a2[i]), p), xrange(l))), (1/p))
 
 
 def join(l1, l2, key, method, l):
