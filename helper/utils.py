@@ -20,22 +20,30 @@ def load_data(file_name):
     return filter(lambda x: x['truth'] != -1, output)
 
 
-def print_list(l, c=None):
+def print_list(l, c=None, should_print=True):
+    output = ""
     for i in l:
-        print i
+        if should_print:
+            print i
+        output += str(i)+"\n"
         if c:
             c -= 1
             if not c:
                 break
+    return output
 
 
-def print_dict(d, c=None):
+def print_dict(d, c=None, should_print=True):
+    output = ""
     for k,v in d.items():
-        print k,v
+        if should_print:
+            print k,v
+        output += str(k)+": "+str(v)+"\n"
         if c:
             c -= 1
             if not c:
                 break
+    return output
 
 
 def pick_random(ll, i):
@@ -44,7 +52,7 @@ def pick_random(ll, i):
 
 def distance(a1, a2):
     a1, a2, l = list(a1['expressions']), list(a2['expressions']), len(a1['expressions'])
-    return pow(reduce(lambda x, y: x+y, map(lambda i: pow(a1[i]-a2[i], l), xrange(l))), (1/l))
+    return pow(reduce(lambda x, y: x+y, map(lambda i: pow(abs(a1[i]-a2[i]), l), xrange(l))), (1/l))
 
 
 def join(l1, l2, key, method, l):
