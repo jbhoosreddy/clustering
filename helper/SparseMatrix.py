@@ -2,8 +2,7 @@ from utils import load_data
 from utils import print_dict, print_list
 from utils import distance
 from copy import deepcopy
-import sys
-import itertools
+import sys, itertools, pickle
 
 
 class SparseMatrix(object):
@@ -96,6 +95,11 @@ class SparseMatrix(object):
                             d = original[sub_subset]
                             break
         return d
+
+    def save(self, filename):
+        handle = open('output/'+filename+".pickle", 'w')
+        pickle.dump(self, handle)
+        handle.close()
 
     def __repr__(self):
         matrix = self.matrix
