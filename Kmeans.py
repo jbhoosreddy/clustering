@@ -1,16 +1,23 @@
 from __future__ import division
 from operator import itemgetter
 from copy import deepcopy
-from helper import load_data, print_list, pick_random
+from helper.utils import load_data, print_list, pick
+from helper.validation import jaccard_coefficient
+from helper.graph import plot
 
 
-INPUT_FILE = 'cho.txt'
-CLUSTERS = 5
+INPUT_FILE = 'data/new_dataset_1.txt'
+# IDS = "1,68,203,278,332"
+# IDS = "2,102,263,301,344,356,394,411,474,493"
+IDS = "1,10,20"
+IDS = IDS.split(',')
+CLUSTERS = len(IDS)
 
 
 def distance(a1, a2):
     l = len(a1)
-    return pow(reduce(lambda x, y: x+y, map(lambda i: pow(a1[i]-a2[i], l), xrange(l))), (1/l))
+    p = 2
+    return pow(reduce(lambda x, y: x+y, map(lambda i: pow(a1[i]-a2[i], p), xrange(l))), (1/p))
 
 
 def compute_distance(centroids, data):
@@ -20,12 +27,10 @@ def compute_distance(centroids, data):
 
 def intial_centroids(data):
     centroids = list()
-    i = 1
     while len(centroids) < CLUSTERS:
-        picked = pick_random(data, i)
-        if not len(filter(lambda c: c['id'] == picked['id'], centroids)):
+        for i in IDS:
+            picked = pick(data, i)
             centroids.append(picked)
-            i += 1
     return centroids
 
 
@@ -58,21 +63,20 @@ def converged(prev, next):
     return length == 0
 
 
-if __name__ == "__main__":
-    data = load_data(INPUT_FILE)
+data = load_data(INPUT_FILE)
+original = deepcopy(data)
+prev = deepcopy(data)
+centroids = intial_centroids(data)
+compute_distance(centroids, data)
+while not converged(prev, data):
+    centroids = compute_centroids(data)
     prev = deepcopy(data)
-    centroids = intial_centroids(data)
-    # print_list(centroids)
-    # print_list(data, 1)
     compute_distance(centroids, data)
-    # print_list(data)
-    i = 0
-    while not converged(prev, data):
-        i += 1
-        print "Iteration:", i
-        centroids = compute_centroids(data)
-        # print_list(centroids)
-        prev = deepcopy(data)
-        compute_distance(centroids, data)
-    print_list(centroids)
-    # print data
+
+for i in range(0, CLUSTERS):
+    print centroids[i]['cluster'],
+    print map(lambda c: c['id'], filter(lambda d: d['cluster'] == i+1, data))
+
+print jaccard_coefficient(original, data)
+
+# plot(data, centroids)
