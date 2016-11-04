@@ -62,7 +62,7 @@ if __name__ == "__main__":
     data = load_data(INPUT_FILE)
     prev = deepcopy(data)
     centroids = intial_centroids(data)
-    print_list(centroids)
+    # print_list(centroids)
     # print_list(data, 1)
     compute_distance(centroids, data)
     # print_list(data)
@@ -71,7 +71,8 @@ if __name__ == "__main__":
         i += 1
         print "Iteration:", i
         centroids = compute_centroids(data)
-        print_list(centroids)
+        # print_list(centroids)
         prev = deepcopy(data)
         compute_distance(centroids, data)
-    print data
+    print_list(centroids)
+    # print data
