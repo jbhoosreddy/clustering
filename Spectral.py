@@ -11,10 +11,10 @@ import time
 
 iterations = None
 
-filename = 'iyer'
+filename = 'new_dataset_1'
 # IDS = "1,68,203,278,332"
-IDS = "2,102,263,301,344,356,394,411,474,493"
-# IDS = "1,10,20"
+# IDS = "2,102,263,301,344,356,394,411,474,493"
+IDS = "1,10,20"
 # IDS = "1,4"
 INPUT_FILE = 'data/'+filename+'.txt'
 IDS = IDS.split(',')
@@ -26,9 +26,9 @@ points = map(lambda d: d['expressions'], data)
 matrix = distance_matrix(points, points, p=2)
 laplacian_matrix = laplacian(matrix)
 
-vals, vecs = eigs(laplacian_matrix, k=4)
-for i in xrange(len(data)):
-    data[i]['expressions'] = vecs[i]
+vals, vecs = eigs(laplacian_matrix, k=3)
+# for i in xrange(len(data)):
+#     data[i]['expressions'] = vecs[i]
 
 
 def distance(a1, a2):
@@ -100,7 +100,7 @@ for i in range(0, CLUSTERS):
     print map(lambda c: c['id'], filter(lambda d: d['cluster'] == i+1, data))
 end = time.time()
 print "time elapsed", end-start
-print jaccard_coefficient(original, data)
+print "Jaccard Coefficient", jaccard_coefficient(original, data)
 for i in range(len(data)):
     data[i]['expressions'] = points[i]
 

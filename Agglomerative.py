@@ -28,18 +28,25 @@ end = time.time()
 print "time elapsed", end-start
 matrix.save("agglomerative-" + filename)
 clusters = list(matrix.history[THRESHOLD])
-# print clusters
+print_list(clusters)
 truths = map(lambda cluster: map(lambda point: filter(lambda d: d['id'] == point, data)[0]['truth'], cluster), clusters)
 
 ids = map(lambda d: d['id'], data)
 for i in range(THRESHOLD):
     truth = map(lambda t: t.count(i+1), truths)
-    print truth
+    # print truth
     idx = max(xrange(len(truth)), key=truth.__getitem__)
     for p in clusters[idx]:
         idx = ids.index(p)
         data[idx]['cluster'] = i+1
 
-print jaccard_coefficient(original, data)
+print "Jaccard Coefficient", jaccard_coefficient(original, data)
+
+i = 1
+for cluster in clusters:
+    for p in cluster:
+        dp = filter(lambda d: d['id'] == p, data)[0]
+        dp['cluster'] = i
+    i += 1
 
 plot(data, n=THRESHOLD, filename="output/agglomerative-"+filename+".png")

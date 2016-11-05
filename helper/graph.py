@@ -5,30 +5,35 @@ import numpy as np
 
 
 def plot(data, centroids=None, n=None, filename=None, truth=None):
+    if truth: key = 'truth'
+    else: key = 'cluster'
+    cluster = map(lambda d: d[key], data)
+    points = map(lambda d: d['expressions'], data)
 
     fig, ax = plt.subplots()
     if centroids:
         colors = iter(cm.rainbow(np.linspace(0, 1, len(centroids))))
-        centroids = map(lambda d: d['expressions'], centroids)
-        pca = PCA(n_components=2)
-        fitted_centroids = pca.fit_transform(centroids)
+        c_centroids = map(lambda d: d['expressions'], centroids)
+        c_cluster = range(1,len(centroids)+1)
+        points.extend(c_centroids)
+        cluster.extend(c_cluster)
         n = len(centroids)
     elif n:
         colors = iter(cm.rainbow(np.linspace(0, 1, n)))
+    pca = PCA(n_components=2)
+    pca.fit(points)
+    fitted = pca.transform(points)
     for i in range(n):
-        pca = PCA(n_components=2)
         c = next(colors)
+        ids = [q for q, x in enumerate(cluster) if x == i+1]
+        c_points = fitted[ids, :]
         if centroids:
-            centroid = fitted_centroids[i]
+            centroid = c_points[(-1), :]
             plt.scatter(centroid[0], centroid[1], color=c, marker='x', s=80)
-        if truth:
-            points = map(lambda f: f['expressions'], filter(lambda d: d['truth'] == i + 1, data))
-        else:
-            points = map(lambda f: f['expressions'], filter(lambda d: d['cluster'] == i + 1, data))
-        if len(points):
-            fitted = pca.fit_transform(points)
-            if fitted.shape[1] == 2:
-                plt.scatter(fitted[:, 0], fitted[:, 1], color=c)
+
+        if len(c_points):
+            if c_points.shape[1] == 2:
+                plt.scatter(c_points[:, 0], c_points[:, 1], color=c)
         # break
     plt.show()
     if filename:
