@@ -5,13 +5,16 @@ from helper.utils import load_data, print_list, pick
 from helper.validation import jaccard_coefficient
 from helper.graph import plot
 
-
-INPUT_FILE = 'data/new_dataset_1.txt'
-# IDS = "1,68,203,278,332"
+filename = "cho"
+IDS = "1,68,203,278,332"
 # IDS = "2,102,263,301,344,356,394,411,474,493"
-IDS = "1,10,20"
+# IDS = "1,10,20"
+# IDS = "1,4"
 IDS = IDS.split(',')
 CLUSTERS = len(IDS)
+INPUT_FILE = 'data/'+filename+'.txt'
+
+iterations = None
 
 
 def distance(a1, a2):
@@ -68,15 +71,20 @@ original = deepcopy(data)
 prev = deepcopy(data)
 centroids = intial_centroids(data)
 compute_distance(centroids, data)
+i = 0
 while not converged(prev, data):
+    if iterations:
+        if i == iterations:
+            break
+        i += 1
     centroids = compute_centroids(data)
     prev = deepcopy(data)
     compute_distance(centroids, data)
 
-for i in range(0, CLUSTERS):
+for i in range(CLUSTERS):
     print centroids[i]['cluster'],
     print map(lambda c: c['id'], filter(lambda d: d['cluster'] == i+1, data))
 
 print jaccard_coefficient(original, data)
 
-# plot(data, centroids)
+plot(data, centroids=centroids, filename="output/kmeans-"+filename+".png")

@@ -5,13 +5,17 @@ from scipy.sparse.csgraph import laplacian
 from scipy.sparse.linalg import eigs
 from copy import deepcopy
 from helper.validation import jaccard_coefficient
+from helper.graph import plot
 from helper.utils import load_data, pick
 
-filename = 'new_dataset_1'
-INPUT_FILE = 'data/'+filename+'.txt'
-# IDS = "1,68,203,278,332"
+iterations = None
+
+filename = 'cho'
+IDS = "1,68,203,278,332"
 # IDS = "2,102,263,301,344,356,394,411,474,493"
-IDS = "1,10,20"
+# IDS = "1,10,20"
+# IDS = "1,4"
+INPUT_FILE = 'data/'+filename+'.txt'
 IDS = IDS.split(',')
 CLUSTERS = len(IDS)
 data = load_data('data/' + filename + '.txt')
@@ -78,7 +82,12 @@ original = deepcopy(data)
 prev = deepcopy(data)
 centroids = intial_centroids(data)
 compute_distance(centroids, data)
+i = 0
 while not converged(prev, data):
+    if iterations:
+        if i == iterations:
+            break
+        i += 1
     centroids = compute_centroids(data)
     prev = deepcopy(data)
     compute_distance(centroids, data)
@@ -88,5 +97,7 @@ for i in range(0, CLUSTERS):
     print map(lambda c: c['id'], filter(lambda d: d['cluster'] == i+1, data))
 
 print jaccard_coefficient(original, data)
+for i in range(len(data)):
+    data[i]['expressions'] = points[i]
 
-# plot(data, centroids)
+plot(data, centroids=centroids, filename="output/spectral-"+filename+".png")

@@ -4,11 +4,12 @@ from helper.utils import load_data
 from copy import deepcopy
 from helper.validation import jaccard_coefficient
 import pickle
+from helper.graph import plot
 
-filename = 'new_dataset_1'
+filename = 'cho'
+THRESHOLD = 5
 data = load_data('data/' + filename + '.txt')
 original = deepcopy(data)
-THRESHOLD = 3
 CACHE = False
 print_list(data)
 if CACHE:
@@ -36,6 +37,6 @@ for i in range(THRESHOLD):
         idx = ids.index(p)
         data[idx]['cluster'] = i+1
 
-# print_list(data)
 print jaccard_coefficient(original, data)
 
+plot(data, n=THRESHOLD, filename="output/agglomerative-"+filename+".png")
