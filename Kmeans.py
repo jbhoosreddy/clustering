@@ -1,20 +1,21 @@
 from __future__ import division
+import time
 from operator import itemgetter
 from copy import deepcopy
 from helper.utils import load_data, print_list, pick
 from helper.validation import jaccard_coefficient
 from helper.graph import plot
 
-filename = "cho"
-IDS = "1,68,203,278,332"
-# IDS = "2,102,263,301,344,356,394,411,474,493"
+filename = "iyer"
+# IDS = "1,68,203,278,332"
+IDS = "2,102,263,301,344,356,394,411,474,493"
 # IDS = "1,10,20"
 # IDS = "1,4"
 IDS = IDS.split(',')
 CLUSTERS = len(IDS)
 INPUT_FILE = 'data/'+filename+'.txt'
 
-iterations = None
+iterations = 5
 
 
 def distance(a1, a2):
@@ -66,6 +67,7 @@ def converged(prev, next):
     return length == 0
 
 
+start = time.time()
 data = load_data(INPUT_FILE)
 original = deepcopy(data)
 prev = deepcopy(data)
@@ -77,14 +79,14 @@ while not converged(prev, data):
         if i == iterations:
             break
         i += 1
+        print i+1
     centroids = compute_centroids(data)
     prev = deepcopy(data)
     compute_distance(centroids, data)
-
 for i in range(CLUSTERS):
     print centroids[i]['cluster'],
     print map(lambda c: c['id'], filter(lambda d: d['cluster'] == i+1, data))
-
+end = time.time()
+print "time elapsed", end-start
 print jaccard_coefficient(original, data)
-
-plot(data, centroids=centroids, filename="output/kmeans-"+filename+".png")
+plot(data, centroids=centroids, filename="output/truth-"+filename+".png", truth=True)

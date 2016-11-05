@@ -7,17 +7,19 @@ from copy import deepcopy
 from helper.validation import jaccard_coefficient
 from helper.graph import plot
 from helper.utils import load_data, pick
+import time
 
 iterations = None
 
-filename = 'cho'
-IDS = "1,68,203,278,332"
-# IDS = "2,102,263,301,344,356,394,411,474,493"
+filename = 'iyer'
+# IDS = "1,68,203,278,332"
+IDS = "2,102,263,301,344,356,394,411,474,493"
 # IDS = "1,10,20"
 # IDS = "1,4"
 INPUT_FILE = 'data/'+filename+'.txt'
 IDS = IDS.split(',')
 CLUSTERS = len(IDS)
+start = time.time()
 data = load_data('data/' + filename + '.txt')
 
 points = map(lambda d: d['expressions'], data)
@@ -88,6 +90,7 @@ while not converged(prev, data):
         if i == iterations:
             break
         i += 1
+        print i
     centroids = compute_centroids(data)
     prev = deepcopy(data)
     compute_distance(centroids, data)
@@ -95,7 +98,8 @@ while not converged(prev, data):
 for i in range(0, CLUSTERS):
     print centroids[i]['cluster'],
     print map(lambda c: c['id'], filter(lambda d: d['cluster'] == i+1, data))
-
+end = time.time()
+print "time elapsed", end-start
 print jaccard_coefficient(original, data)
 for i in range(len(data)):
     data[i]['expressions'] = points[i]
